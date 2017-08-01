@@ -3,17 +3,17 @@
     var config = {
         pageInit: function (data) {
             config.ajaxData();
-            config.addPage(5, 'div');
-            var btn = ['nextPage', 'prePage', 'homePage', 'lastPage'];
-            config.addBtn(btn);
-            config.disableBtn();
-            config.setActive();
-            config.addClick();
         },
-        addPage: function (num, id) {
+        addPage: function (id) {
             var startPageBtn = '<ul class="pagination"><li><a id="homePage">首页</a></li><li><a id="prePage">上一页</a></li>';
             var endPageBtn = '<li><a id="nextPage">下一页</a></li><li><a id="lastPage">末页</a></li></ul>';
-            for (var i = 0; i < parseInt(num); i++) {
+            var length = $.fn.paging.defaults.pageStep;
+            if($.fn.paging.defaults.totalPage > $.fn.paging.defaults.pageStep){
+                 endPageBtn = '<li><a>...</a></li><li><a id="nextPage">下一页</a></li><li><a id="lastPage">末页</a></li></ul>'
+            }else{
+                length = $.fn.paging.defaults.totalPage;
+            }
+            for (var i = 0; i < length - 1; i++) {
                 var j = i + 1;
                 startPageBtn += '<li><a page-id="' + j + '">' + j + '</a></li>';
             }
@@ -28,7 +28,14 @@
                 success: function (data) {
                     $.fn.paging.defaults.rowData = data.rows;
                     $.fn.paging.defaults.total = data.total;
+                    $.fn.paging.defaults.totalPage = Math.ceil($.fn.paging.defaults.total / $.fn.paging.defaults.pageData);
                     config.showData($.fn.paging.defaults.current);
+                    config.addPage('div');
+                    var btn = ['nextPage', 'prePage', 'homePage', 'lastPage'];
+                    config.addBtn(btn);
+                    config.addClick();
+                    config.setActive();
+                    config.disableBtn();
                 }
             })
         },
@@ -71,7 +78,7 @@
             config.showData($.fn.paging.defaults.current);
         },
         lastPage: function () {
-            $.fn.paging.defaults.current = Math.ceil($.fn.paging.defaults.total / $.fn.paging.defaults.pageData);
+            $.fn.paging.defaults.current = $.fn.paging.defaults.totalPage;
             config.showData($.fn.paging.defaults.current);
         },
         nextPage: function () {
@@ -117,7 +124,7 @@
                 $('#homePage').removeAttr("disabled");
                 $('#homePage').css('background-color', '#fff');
             }
-            if ($.fn.paging.defaults.current >= Math.ceil($.fn.paging.defaults.total / $.fn.paging.defaults.pageData)) {
+            if ($.fn.paging.defaults.current >= $.fn.paging.defaults.totalPage) {
                 $('#nextPage').attr("disabled", 'disabled');
                 $('#lastPage').attr("disabled", 'disabled');
                 $('#nextPage').css('background-color', '#ddd');
@@ -148,7 +155,8 @@
                 total: option.total || 10,
                 pageData: option.pageData || 4,
                 current: option.current || 1,
-                pageStep: option.pageStep || 10, //当前可见最多页码个数
+                pageStep: option.pageStep || 5, //当前可见最多页码个数
+                totalPage: 1,
                 prevBtn: 'pg-prev', //上一页按钮
                 nextBtn: 'pg-next', //下一页按钮
                 btnBool: true, //是否显示上一页下一页
@@ -169,7 +177,8 @@
         total: 10, //数据总条数
         pageData: 4, //每页数据条数
         current: 1, //当前页码数
-        pageStep: 10, //当前可见最多页码个数
+        totalPage: 1,
+        pageStep: 5, //当前可见最多页码个数
         prevBtn: 'pg-prev', //上一页按钮
         nextBtn: 'pg-next', //下一页按钮
         btnBool: true, //是否显示上一页下一页
