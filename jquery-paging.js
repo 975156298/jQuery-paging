@@ -4,21 +4,81 @@
         pageInit: function (data) {
             config.ajaxData();
         },
-        addPage: function (id) {
-            var startPageBtn = '<ul class="pagination"><li><a id="homePage">首页</a></li><li><a id="prePage">上一页</a></li>';
-            var endPageBtn = '<li><a id="nextPage">下一页</a></li><li><a id="lastPage">末页</a></li></ul>';
+        addPage: function () {
+            var startPageBtn = '<ul class="pagination"><li><a id="homePage">首页</a></li><li><a id="prePage">上一页</a></li><li><a page-id="1">' + 1 + '</a></li>';
+            var endPageBtn = '<li><a page-id="' + $.fn.paging.defaults.totalPage + '">' + $.fn.paging.defaults.totalPage + '</a></li><li><a id="nextPage">下一页</a></li><li><a id="lastPage">末页</a></li></ul>';
             var length = $.fn.paging.defaults.pageStep;
-            if($.fn.paging.defaults.totalPage > $.fn.paging.defaults.pageStep){
-                 endPageBtn = '<li><a>...</a></li><li><a id="nextPage">下一页</a></li><li><a id="lastPage">末页</a></li></ul>'
-            }else{
+            if ($.fn.paging.defaults.totalPage > $.fn.paging.defaults.pageStep) {
+                endPageBtn = '<li><a page-id="-1">...</a></li>' + endPageBtn;
+            } else {
                 length = $.fn.paging.defaults.totalPage;
             }
-            for (var i = 0; i < length - 1; i++) {
+            for (var i = 1; i < length - 1; i++) {
                 var j = i + 1;
                 startPageBtn += '<li><a page-id="' + j + '">' + j + '</a></li>';
             }
             var pageBtn = startPageBtn + endPageBtn;
-            $('#' + id).append(pageBtn);
+            $('#' + $.fn.paging.defaults.id).append(pageBtn);
+        },
+        updateBtn: function () {
+            var length = $.fn.paging.defaults.pageStep - 2;
+            var num = 0;
+            var startPageBtn = '<ul class="pagination"><li><a id="homePage">首页</a></li><li><a id="prePage">上一页</a></li><li><a page-id="1">' + 1 + '</a></li>';
+            var endPageBtn = '<li><a page-id="' + $.fn.paging.defaults.totalPage + '">' + $.fn.paging.defaults.totalPage + '</a></li><li><a id="nextPage">下一页</a></li><li><a id="lastPage">末页</a></li></ul>';
+            if ($.fn.paging.defaults.totalPage / 2 > $.fn.paging.defaults.current) {
+                if ($.fn.paging.defaults.current - Math.floor(length / 2) - 1 > 1) {
+                    startPageBtn = startPageBtn + '<li><a page-id="-2">...</a></li>';
+                    if($.fn.paging.defaults.current - Math.floor(length / 2) - 1 != $.fn.paging.defaults.totalPage / 2){
+                        endPageBtn = '<li><a page-id="-1">...</a></li>' + endPageBtn;
+                    }
+                    if(length % 2 == 0){
+                        num = $.fn.paging.defaults.current - Math.floor(length / 2);
+                    }else{
+                        num = $.fn.paging.defaults.current - Math.floor(length / 2) -1;
+                    }
+                    for (var i = num; i < $.fn.paging.defaults.current; i++) {
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
+                    }
+                    for (var i = $.fn.paging.defaults.current; i < $.fn.paging.defaults.current + Math.floor(length / 2); i++) {
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
+                    }
+                } else {
+                    endPageBtn = '<li><a page-id="-1">...</a></li>' + endPageBtn;
+                    for (var i = 2; i < 2 + length; i++) {
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
+                    }
+                }
+            }
+            if ($.fn.paging.defaults.totalPage / 2 <= $.fn.paging.defaults.current) {
+                if ($.fn.paging.defaults.current + Math.floor(length / 2) < $.fn.paging.defaults.totalPage) {
+                    startPageBtn = startPageBtn + '<li><a page-id="-2">...</a></li>';
+                    if($.fn.paging.defaults.current + Math.floor(length / 2) + 1 != $.fn.paging.defaults.totalPage){
+                        endPageBtn = '<li><a page-id="-1">...</a></li>' + endPageBtn;
+                    }
+                    if(length % 2 == 0){
+                        num = $.fn.paging.defaults.current - Math.floor(length / 2) + 1;
+                    }else{
+                        num = $.fn.paging.defaults.current - Math.floor(length / 2)
+                    }
+                    for (var i = num; i < $.fn.paging.defaults.current; i++) {
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
+                    }
+                    for (var i = $.fn.paging.defaults.current; i < $.fn.paging.defaults.current + Math.floor(length / 2) + 1; i++) {
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
+                    }
+                } else {
+                    startPageBtn = startPageBtn + '<li><a page-id="-2">...</a></li>';
+                    for (var i = $.fn.paging.defaults.totalPage - length; i < $.fn.paging.defaults.totalPage; i++) {
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
+                    }
+                }
+            }
+            $('#' + $.fn.paging.defaults.id).empty();
+            var pageBtn = startPageBtn + endPageBtn;
+            $('#' + $.fn.paging.defaults.id).append(pageBtn);
+            var btn = ['nextPage', 'prePage', 'homePage', 'lastPage'];
+            config.addBtn(btn);
+            config.addClick();
         },
         ajaxData: function () {
             $.ajax({
@@ -30,7 +90,7 @@
                     $.fn.paging.defaults.total = data.total;
                     $.fn.paging.defaults.totalPage = Math.ceil($.fn.paging.defaults.total / $.fn.paging.defaults.pageData);
                     config.showData($.fn.paging.defaults.current);
-                    config.addPage('div');
+                    config.addPage($.fn.paging.defaults.id);
                     var btn = ['nextPage', 'prePage', 'homePage', 'lastPage'];
                     config.addBtn(btn);
                     config.addClick();
@@ -47,10 +107,22 @@
                 }
                 (function (i) {
                     $('.pagination li a').eq(i).click(function () {
-                        $.fn.paging.defaults.current = parseInt($('.pagination li a').eq(i).attr('page-id'));
+                        if(parseInt($('.pagination li a').eq(i).attr('page-id')) == -1){
+                            $.fn.paging.defaults.current = parseInt($('.pagination li a').eq(btns.length - 5).attr('page-id'));
+                            config.updateBtn();
+                        }
+                        if(parseInt($('.pagination li a').eq(i).attr('page-id')) == -2){
+                            $.fn.paging.defaults.current = parseInt($('.pagination li a').eq(5).attr('page-id'));
+                            config.updateBtn();
+                        }
+                        if(parseInt($('.pagination li a').eq(i).attr('page-id')) != -1 && parseInt($('.pagination li a').eq(i).attr('page-id')) != -2){
+                            $.fn.paging.defaults.current = parseInt($('.pagination li a').eq(i).attr('page-id'));
+                        }
+                        config.updateBtn();
                         config.disableBtn();
                         config.setActive();
                         config.showData($.fn.paging.defaults.current);
+
                     })
                 })(i);
 
@@ -76,18 +148,22 @@
         homePage: function () {
             $.fn.paging.defaults.current = 1;
             config.showData($.fn.paging.defaults.current);
+            config.updateBtn();
         },
         lastPage: function () {
             $.fn.paging.defaults.current = $.fn.paging.defaults.totalPage;
             config.showData($.fn.paging.defaults.current);
+            config.updateBtn();
         },
         nextPage: function () {
             $.fn.paging.defaults.current = $.fn.paging.defaults.current + 1;
             config.showData($.fn.paging.defaults.current);
+            config.updateBtn();
         },
         prePage: function () {
             $.fn.paging.defaults.current = $.fn.paging.defaults.current - 1;
             config.showData($.fn.paging.defaults.current);
+            config.updateBtn();
         },
         showData: function (pageNum) {
             var startNum = (parseInt(pageNum) - 1) * $.fn.paging.defaults.pageData;
@@ -150,12 +226,13 @@
         },
         defaluts: function (option) {
             $.fn.paging.defaults = {
+                id: option.id,
                 url: option.url,
                 rowData: [],
                 total: option.total || 10,
                 pageData: option.pageData || 4,
                 current: option.current || 1,
-                pageStep: option.pageStep || 5, //当前可见最多页码个数
+                pageStep: option.pageStep > 5 ? option.pageStep : 5 || 5, //当前可见最多页码个数
                 totalPage: 1,
                 prevBtn: 'pg-prev', //上一页按钮
                 nextBtn: 'pg-next', //下一页按钮
@@ -168,12 +245,14 @@
     };
 
     $.fn.paging = function (option) {
+        option.id = $(this).attr('id');
         config.defaluts(option);
         config.pageInit(option);
     };
     $.fn.paging.defaults = {
         url: '',
         rowData: [],
+        id: '',
         total: 10, //数据总条数
         pageData: 4, //每页数据条数
         current: 1, //当前页码数
