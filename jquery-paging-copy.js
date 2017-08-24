@@ -5,97 +5,78 @@
             config.ajaxData();
         },
         addPage: function () {
-            var startPageBtn = '<ul class="pagination"><li><a id="homePage">首页</a></li><li><a id="prePage">上一页</a></li><li><a page-id="1">' + 1 + '</a></li><li style="display: none"><a page-id="-2">...</a></li>';
+            var startPageBtn = '<ul class="pagination"><li><a id="homePage">首页</a></li><li><a id="prePage">上一页</a></li><li><a page-id="1">' + 1 + '</a></li>';
             var endPageBtn = '<li><a page-id="' + $.fn.paging.defaults.totalPage + '">' + $.fn.paging.defaults.totalPage + '</a></li><li><a id="nextPage">下一页</a></li><li><a id="lastPage">末页</a></li></ul>';
             var length = $.fn.paging.defaults.pageStep;
-            for (var i = 1; i < $.fn.paging.defaults.totalPage - 1; i++) {
-                var j = i + 1;
-                if (i < length - 1) {
-                    startPageBtn += '<li style="display: inline"><a page-id="' + j + '">' + j + '</a></li>';
-                } else {
-                    startPageBtn += '<li style="display: none"><a page-id="' + j + '">' + j + '</a></li>';
-                }
-            }
-            if ($.fn.paging.defaults.totalPage > length) {
-                endPageBtn = '<li style="display: inline"><a page-id="-1">...</a></li>' + endPageBtn;
+            if ($.fn.paging.defaults.totalPage > $.fn.paging.defaults.pageStep) {
+                endPageBtn = '<li><a page-id="-1">...</a></li>' + endPageBtn;
             } else {
-                endPageBtn = '<li style="display: none"><a page-id="-1">...</a></li>' + endPageBtn;
+                length = $.fn.paging.defaults.totalPage;
             }
-
+            for (var i = 1; i < length - 1; i++) {
+                var j = i + 1;
+                startPageBtn += '<li><a page-id="' + j + '">' + j + '</a></li>';
+            }
             var pageBtn = startPageBtn + endPageBtn;
             $('#' + $.fn.paging.defaults.id).append(pageBtn);
         },
         updateBtn: function () {
             var length = $.fn.paging.defaults.pageStep - 2;
             var num = 0;
-            if (length % 2 == 0) {
-                num = $.fn.paging.defaults.current + Math.floor(length / 2);
-            } else {
-                num = $.fn.paging.defaults.current + Math.floor(length / 2) + 1;
-            }
+            var startPageBtn = '<ul class="pagination"><li><a id="homePage">首页</a></li><li><a id="prePage">上一页</a></li><li><a page-id="1">' + 1 + '</a></li>';
+            var endPageBtn = '<li><a page-id="' + $.fn.paging.defaults.totalPage + '">' + $.fn.paging.defaults.totalPage + '</a></li><li><a id="nextPage">下一页</a></li><li><a id="lastPage">末页</a></li></ul>';
             if ($.fn.paging.defaults.totalPage / 2 > $.fn.paging.defaults.current) {
                 if ($.fn.paging.defaults.current - Math.floor(length / 2) - 1 > 1) {
-                    config.showBtn(num, length);
+                    startPageBtn = startPageBtn + '<li><a page-id="-2">...</a></li>';
+                    if($.fn.paging.defaults.current - Math.floor(length / 2) - 1 != $.fn.paging.defaults.totalPage / 2){
+                        endPageBtn = '<li><a page-id="-1">...</a></li>' + endPageBtn;
+                    }
+                    if(length % 2 == 0){
+                        num =  $.fn.paging.defaults.current + Math.floor(length / 2);
+                    }else{
+                        num = $.fn.paging.defaults.current + Math.floor(length / 2) + 1;
+                    }
+                    for (var i = $.fn.paging.defaults.current - Math.floor(length / 2); i < $.fn.paging.defaults.current; i++) {
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
+                    }
+                    for (var i = $.fn.paging.defaults.current; i < num; i++) {
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
+                    }
                 } else {
-                    config.hideBtn();
-                    config.blankBtn($.fn.paging.defaults.totalPage);
-                    $('.pagination li').eq(3).css('display', 'none');
+                    endPageBtn = '<li><a page-id="-1">...</a></li>' + endPageBtn;
                     for (var i = 2; i < 2 + length; i++) {
-                        $('.pagination li').eq(i + 2).css('display', 'inline');
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
                     }
                 }
-            } else {
+            }
+            if ($.fn.paging.defaults.totalPage / 2 <= $.fn.paging.defaults.current) {
                 if ($.fn.paging.defaults.current + Math.floor(length / 2) < $.fn.paging.defaults.totalPage) {
-                    config.showBtn(num, length);
+                    startPageBtn = startPageBtn + '<li><a page-id="-2">...</a></li>';
+                    if($.fn.paging.defaults.current + Math.floor(length / 2) + 1 != $.fn.paging.defaults.totalPage){
+                        endPageBtn = '<li><a page-id="-1">...</a></li>' + endPageBtn;
+                    }
+                    if(length % 2 == 0){
+                        num = $.fn.paging.defaults.current - Math.floor(length / 2) + 1;
+                    }else{
+                        num = $.fn.paging.defaults.current - Math.floor(length / 2);
+                    }
+                    for (var i = num; i < $.fn.paging.defaults.current; i++) {
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
+                    }
+                    for (var i = $.fn.paging.defaults.current; i < $.fn.paging.defaults.current + Math.floor(length / 2) + 1; i++) {
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
+                    }
                 } else {
-                    config.hideBtn();
-                    $('.pagination li').eq($.fn.paging.defaults.totalPage + 2).css('display', 'none');
-                    config.blankBtn(1);
+                    startPageBtn = startPageBtn + '<li><a page-id="-2">...</a></li>';
                     for (var i = $.fn.paging.defaults.totalPage - length; i < $.fn.paging.defaults.totalPage; i++) {
-                        $('.pagination li').eq(i + 2).css('display', 'inline');
+                        startPageBtn += '<li><a page-id="' + i + '">' + i + '</a></li>';
                     }
                 }
             }
-        },
-        blankBtn: function (num) {
-            if ($.fn.paging.defaults.totalPage > $.fn.paging.defaults.pageStep) {
-                $('.pagination li').eq(num + 2).css('display', 'inline');
-            } else {
-                $('.pagination li').eq(num + 2).css('display', 'none');
-            }
-        },
-        showBtn: function (num, length) {
-            config.hideBtn();
-            var number = parseInt($('.pagination li a').eq($.fn.paging.defaults.current + 2).attr('page-id'));
-            var count = $.fn.paging.defaults.current - Math.floor(length / 2);
-            for (var i = 1; i < $.fn.paging.defaults.totalPage - 1; i++) {
-                if (number < num && number >= $.fn.paging.defaults.current - Math.floor(length / 2)) {
-                    $('.pagination li').eq(number + 2).css('display', 'inline');
-                    if (count > 1) {
-                        $('.pagination li').eq(count + 2).css('display', 'inline');
-                    }
-                    if ($.fn.paging.defaults.totalPage == $.fn.paging.defaults.pageStep) {
-                        $('.pagination li').eq($.fn.paging.defaults.totalPage + 1).css('display', 'inline');
-                    }
-                }
-                number++;
-                count++;
-            }
-            if($('.pagination li').eq(4).css('display') == 'none'){
-                $('.pagination li').eq(3).css('display','inline');
-            }else{
-                $('.pagination li').eq(3).css('display','none');
-            }
-            if($('.pagination li').eq($.fn.paging.defaults.totalPage + 1).css('display') == 'none'){
-                $('.pagination li').eq($.fn.paging.defaults.totalPage + 2).css('display','inline');
-            }else{
-                $('.pagination li').eq($.fn.paging.defaults.totalPage + 2).css('display','none');
-            }
-        },
-        hideBtn: function () {
-            for (var i = 1; i < $.fn.paging.defaults.totalPage - 1; i++) {
-                $('.pagination li').eq(i + 3).css('display', 'none');
-            }
+            var pageBtn = startPageBtn + endPageBtn;
+            $('#' + $.fn.paging.defaults.id).html(pageBtn);
+            config.addBtn($.fn.paging.defaults.btn);
+            config.addClick();
         },
         ajaxData: function () {
             $.ajax({
@@ -106,9 +87,6 @@
                     $.fn.paging.defaults.rowData = data.rows;
                     $.fn.paging.defaults.total = data.total;
                     $.fn.paging.defaults.totalPage = Math.ceil($.fn.paging.defaults.total / $.fn.paging.defaults.pageData);
-                    if($.fn.paging.defaults.totalPage < $.fn.paging.defaults.pageStep){
-                        $.fn.paging.defaults.pageStep = $.fn.paging.defaults.totalPage;
-                    }
                     config.showData($.fn.paging.defaults.current);
                     config.addPage($.fn.paging.defaults.id);
                     config.addBtn($.fn.paging.defaults.btn);
@@ -126,13 +104,13 @@
                 }
                 (function (i) {
                     $('.pagination li a').eq(i).click(function () {
-                        if (parseInt($('.pagination li a').eq(i).attr('page-id')) == -1) {
+                        if(parseInt($('.pagination li a').eq(i).attr('page-id')) == -1){
                             $.fn.paging.defaults.current = parseInt($('.pagination li a').eq(btns.length - 5).attr('page-id'));
                         }
-                        if (parseInt($('.pagination li a').eq(i).attr('page-id')) == -2) {
+                        if(parseInt($('.pagination li a').eq(i).attr('page-id')) == -2){
                             $.fn.paging.defaults.current = parseInt($('.pagination li a').eq(5).attr('page-id')) - 1;
                         }
-                        if (parseInt($('.pagination li a').eq(i).attr('page-id')) != -1 && parseInt($('.pagination li a').eq(i).attr('page-id')) != -2) {
+                        if(parseInt($('.pagination li a').eq(i).attr('page-id')) != -1 && parseInt($('.pagination li a').eq(i).attr('page-id')) != -2){
                             $.fn.paging.defaults.current = parseInt($('.pagination li a').eq(i).attr('page-id'));
                         }
                         config.updateBtn();
@@ -195,7 +173,7 @@
             })
         },
         replaceData: function (data) {
-            var item = $.fn.paging.defaults.tableAttr;
+            var item = ['ID', 'name', 'password', 'age'];
             var strHead = '<tr>';
             var strEnd = '</tr>';
             for (var i in item) {
@@ -250,11 +228,11 @@
                 current: option.current || 1,
                 pageStep: option.pageStep > 5 ? option.pageStep : 5 || 5, //当前可见最多页码个数
                 totalPage: 1,
-                btn: ['nextPage', 'prePage', 'homePage', 'lastPage'],
-                tableAttr: option.tableAttr || ['ID', 'name', 'password', 'age']
+                btn: ['nextPage', 'prePage', 'homePage', 'lastPage']
             }
         }
     };
+
     $.fn.paging = function (option) {
         option.id = $(this).attr('id');
         config.defaluts(option);
@@ -269,7 +247,6 @@
         current: 1, //当前页码数
         totalPage: 1,
         pageStep: 5, //当前可见最多页码个数
-        btn: ['nextPage', 'prePage', 'homePage', 'lastPage'],
-        tableAttr: []
+        btn: ['nextPage', 'prePage', 'homePage', 'lastPage']
     };
 }(jQuery, window));
